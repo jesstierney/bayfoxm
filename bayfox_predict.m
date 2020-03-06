@@ -9,7 +9,7 @@ function output = bayfox_predict(d18oc,d18osw,prior_mean,prior_std,species,bayes
 %
 % d18osw: A scalar or vector of d18O of seawater (in VSMOW) (1 x N) or (N x 1)
 %
-% prior_mean: A scalar prior mean value of SST in degrees C.
+% prior_mean: A scalar or vector prior mean value of SST in degrees C.
 %
 % prior_std: A scalar prior standard deviation value of SST in degrees C.
 %
@@ -72,8 +72,17 @@ function output = bayfox_predict(d18oc,d18osw,prior_mean,prior_std,species,bayes
     % Unit adjustment for permil VSMOW to permil VPDB.
     d18osw_adj = d18osw - 0.27;
     % Prior mean and inverse covariance matrix
-    pmu = repmat(ones(nd, 1) * prior_mean,1,n_draws);
-    pinv_cov = repmat(prior_std,nd,n_draws).^-2;
+    if isscalar(prior_mean)
+        pmu = repmat(prior_mean,nd,n_draws);
+    else
+        pmu = repmat(prior_mean,1,n_draws);
+    end
+    
+    if isscalar(prior_std)
+        pinv_cov = repmat(prior_std,nd,n_draws).^-2;
+    else
+        pinv_cov = repmat(prior_std,1,n_draws).^-2;
+    end
     
     % Posterior calculations
     post_mean_num = pinv_cov .* pmu + repmat(sigma',nd,1).^-2 .* repmat(betaT',nd,1) .* (d18oc - repmat(alpha',nd,1) - d18osw_adj);
@@ -83,7 +92,12 @@ function output = bayfox_predict(d18oc,d18osw,prior_mean,prior_std,species,bayes
     output.ens = post_mean + randn(nd,n_draws).*post_sig;
     output.prior_mean = prior_mean;
     output.prior_std = prior_std;
-    % truncate at T < -2.5 (seawater is frozen)
-    output.ens(output.ens < -2.5) = NaN;
+    % resample to enforce the freezing point of seawater...
+    colds = find(output.ens < -2.5);
+    for i=1:length(colds)
+        while output.ens(colds(i)) < -2.5
+            output.ens(colds(i)) = post_mean(colds(i)) + randn(1).*post_sig(colds(i));
+        end
+    end
     output.SST = prctile(sort(output.ens,2),[2.5 50 97.5],2);
 end
