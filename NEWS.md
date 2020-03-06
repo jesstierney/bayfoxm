@@ -1,12 +1,5 @@
-# bayfoxm v0.0.2
+# bayfoxm v1.0
 
 ## Enhancements
 
-## Bug fixes
-
-* Fix bad parameter draw CSV files (Issue #7).
-
-
-# bayfoxm v0.0.1
-
-* Initial release.
+`bayfox_predict.m` now accepts either scalar or vector arguments for the prior mean and standard deviation. There is also now rejection sampling built in to limit SSTs to values above the freezing point of seawater (conservatively set to -2.5C).
