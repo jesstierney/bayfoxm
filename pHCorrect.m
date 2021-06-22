@@ -13,9 +13,9 @@ function d18opH = pHCorrect(d18oc,T,S,pH,type)
 % ----- Inputs -----
 % d18Oc: The 1000-member ensemble estimate of d18O of calcite from bayfox_forward (N x 1000)
 %
-% T: SST (scalar)
-% S: SSS (scalar)
-% pH: pH values for the paleo time period (scalar or vector size N x 1)
+% T: SST (scalar or vector)
+% S: SSS (scalar or vector)
+% pH: pH values for the paleo time period (scalar)
 % type: Optional. Enter 1 to use the reduced sensitivity of O. universa.
 %
 % ----- Outputs -----
@@ -52,7 +52,7 @@ if type == 1
     %use 1-sigma for Orbulina
     dcErr = 0.14;
     %Orbulina regression
-    d18opH = d18oc + normrnd(repmat(-0.27.*(pH - PIpH),1,size(d18oc,2)),repmat(dcErr,size(d18oc,1),size(d18oc,2)));
+    d18opH = d18oc + normrnd(repmat(-0.27.*(pH - PIpH),size(d18oc,1),size(d18oc,2)),repmat(dcErr,size(d18oc,1),size(d18oc,2)));
 else
     %define the 1-sigma error. Best estimate based on culture studies is 0.27
     dcErr = 0.27;
