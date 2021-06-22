@@ -24,7 +24,7 @@ function d18oc = bayfox_forward(t,d18osw,species,bayes)
 %
 % ----- Outputs -----
 %
-% d18oc: A 2000-member ensemble estimate of d18O of calcite. (N x 2000)
+% d18oc: A 1000-member ensemble estimate of d18O of calcite. (N x 1000)
 
     % Ensure column vectors.
     t=t(:);
